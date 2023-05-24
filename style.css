@@ -1,0 +1,39 @@
+.text {
+    text-align: center;
+}
+
+.button1 {
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, 0); 
+}
+
+.notpush {
+    height: 22px;
+    width: 22px;
+}
+
+
+.emot {
+    height: 25px;
+    width: 25px;
+}
+
+.allbtn {
+    border: none; 
+    outline: none;
+    appearance: none;
+    padding: 0px 0px;
+    font-size: 0px;
+}
+
+table {
+    border-collapse:collapse;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, 0); 
+}
+
+td {
+    font-size: 0px;
+}

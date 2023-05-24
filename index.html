@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<p class="text">Сапер</p>
+<p class="text">Сложность: Любитель</p>
+
+<p class="text">Количество мин: 40</p>
+<button class="button1" value="refresh" onClick="window.location.reload();"><img name="emot" class="emot" src="emot/1.png" alt="Emotions"></button>
+
+<table id='table' cellpadding="0" cellspacing="0">
+
+</table>
+
+<script language="JavaScript">
+    let size = 16; //размер подмассива
+    let subarray = []; //массив в который будет выведен результат.
+    
+    const length = 216;
+    const numbers = Array(length).fill(0);
+
+    for (let i = 1; i <= 40; i++) {
+	    numbers.push('x');
+    }
+
+    function shuffle(array) {  //Сложная функция перемешивания массива
+        var currentIndex = array.length, temporaryValue, randomIndex;
+
+        while (0 !== currentIndex) {
+
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];  //Перемешивание таблицы
+            array[randomIndex] = temporaryValue;
+        }
+
+        return array;
+    }
+
+    function secondArr() {
+        shuffle(numbers); //Перемешиваем массив
+
+        for (let i = 0; i < Math.ceil(numbers.length/size); i++){
+            subarray[i] = numbers.slice((i*size), (i*size) + size); 
+        }
+    }
+
+    secondArr();
+
+    const M = 40, N = 2; // Создание двумерного массива расположения бомб
+    var bombs = Array.from(Array(M), () => new Array(N));
+    
+    x = 0;
+    for(let i = 0; i < subarray.length; i++){ // Получаем индексы бомб и заполняем массив
+        let innerArrayLength = subarray[i].length;
+        for(let j = 0; j < innerArrayLength; j++) {
+            if (subarray[i][j] == 'x'){
+                bombs[x][0] = i;
+                bombs[x][1] = j;
+                x++;    //Определяет расположение бомб
+                
+                //Раставляем цифры
+                if ((subarray[i][j-1] != 'x') && (j-1 >= 0)) {
+                    subarray[i][j-1]++;  //Слева от бомбы
+                }
+                if ((subarray[i][j+1] != 'x') && (j+1 <= 15)) {
+                    subarray[i][j+1]++;  //Справа от бомбы
+                }
+
+                if (i-1 >= 0) {
+                    if (subarray[i-1][j] != 'x') {
+                        subarray[i-1][j]++;
+                    }
+                    if ((subarray[i-1][j-1] != 'x') && (j-1 >= 0)) {
+                        subarray[i-1][j-1]++;
+                    }
+                    if ((subarray[i-1][j+1] != 'x') && (j+1 <= 15)) {
+                        subarray[i-1][j+1]++;
+                    }
+                }
+
+                if (i+1 <= 15) {
+                    if (subarray[i+1][j] != 'x') {
+                        subarray[i+1][j]++;
+                    }
+                    if ((subarray[i+1][j-1] != 'x') && (j-1 >= 0)) {
+                        subarray[i+1][j-1]++;
+                    }
+                    if ((subarray[i+1][j+1] != 'x') && (j+1 <= 15)) {
+                        subarray[i+1][j+1]++;
+                    }
+                }
+             }
+        }
+    }
+
+
+
+    function filltable(){
+        let table = document.querySelector('#table'); // Заполнение таблицы
+        line = 0;
+        col = 0;
+
+
+        for (let subArr of subarray) {
+            let tr = document.createElement('tr');
+
+            for (let elem of subArr) {
+                let td = document.createElement('td');
+                tr.appendChild(td);
+                let btn = document.createElement("button");
+                btn.classList.add("allbtn");
+                td.appendChild(btn);
+                let img = document.createElement('img');
+                img.id = elem;
+                position = col + ':' + line;
+                img.name = position;
+                img.src = "images/notpush.png"
+                img.classList.add("notpush");
+                btn.appendChild(img);
+                if (line <= 14) {
+                    line++;
+                } else {
+                    col++;
+                    line = 0;
+                }
+            }
+            table.appendChild(tr);
+        }
+    }
+
+    filltable();
+
+    window.onload = init;
+
+    const buttons = document.querySelectorAll('button');
+
+    function init(){ //Функция загрузки игрового поля после загрузки страницы
+        console.log(`Found ${buttons.length} buttons.`);
+        //console.log(numbers); //Выводим в консоль одномерный массив
+        //console.log(subarray); // Выводим в консоль двумерный массив
+        //console.log(bombs); // Выводим в консоль массив c индексами бомб
+        console.log(subarray); // Выводим поле для игры
+    }
+
+    let arrayzero = [];
+    recurs = 0;
+
+    function zerocheck(pos){
+        var arrayOfStrings = pos.split(':');
+        i = arrayOfStrings[0];
+        j = arrayOfStrings[1];
+        let img = document.querySelector(`[name='${i + ':' + j}']`);
+        img.src = `images/zero.png`;
+        i--;
+        j--;
+        for (let step = 0; step < 3; step++) { // Проходит 3 раза
+            try {
+                for (let down = 0; down < 3; down++) {
+                    if (subarray[i][j] == 0) {
+                        let img = document.querySelector(`[name='${i + ':' + j}']`);
+                        img.src = `images/zero.png`;
+                        if (arrayzero.includes(i+ ':' + j) == false) {
+                            arrayzero.push(i + ':' + j);
+                        } 
+                    }
+                    if ((subarray[i][j] != 0) && (subarray[i][j] != undefined)  && (subarray[i][j] != 'x')) {
+                        let img = document.querySelector(`[name='${i + ':' + j}']`);
+                        img.src = `images/push${subarray[i][j]}.png`
+                    }
+                    j++;
+                }
+                j = j-3;
+                i++; 
+            } catch {
+                i++;
+                for (let down = 0; down < 2; down++) {
+                    if (subarray[i][j] == 0) {
+                        let img = document.querySelector(`[name='${i + ':' + j}']`);
+                        img.src = `images/zero.png`;
+                        if (arrayzero.includes(i+ ':' + j) == false) {
+                            arrayzero.push(i + ':' + j);
+                        } 
+                    }
+                    if ((subarray[i][j] != 0) && (subarray[i][j] != undefined) && (subarray[i][j] != 'x')) {
+                        let img = document.querySelector(`[name='${i + ':' + j}']`);
+                        img.src = `images/push${subarray[i][j]}.png`
+                    }
+                    j++;
+                }
+                j = j-2;
+            }
+            
+        }
+        //console.log(arrayzero);
+    }
+
+    function allzerocheck(){
+        x = 0;
+        while (x < arrayzero.length) {
+            srt = arrayzero[x];
+            let elem = document.querySelector(`[name='${srt}']`);
+            elem.click();
+            x++;
+            recurs = arrayzero.length;
+        }
+    }
+
+    lose = false;
+    buttons.forEach(button => {
+    button.addEventListener('click', event => {
+        if (lose != true) {
+            //console.log(`Button clicked: ${event.target.id}`);
+            id = event.target.id;
+            pos = event.target.name;
+            let img = document.querySelector(`[name='${pos}']`);
+            if ((id == 1) || (id == 2) || (id == 3) || (id == 4) || (id == 5) || (id == 6) || (id == 7) || (id == 8)) {
+                //console.log('Вскрыть: ' + pos);
+                img.src = `images/push${id}.png`
+            } else if (id == 0) {
+                //console.log('Пустая зона сканируем до цифр и вскрываем');
+                zerocheck(pos);
+                if (recurs < arrayzero.length) {
+                    allzerocheck();
+                }
+            } else {
+                x = 0;
+                //console.log('Не повезло, открыть все мины! И заблокировать поле!');
+                while (x < 40) {
+                    i = bombs[x][0];
+                    j = bombs[x][1];
+                    let img = document.querySelector(`[name='${i + ':' + j}']`);
+                    img.src = `images/bombnotboom.png`;
+                    x++;
+                }
+                img.src = `images/bombboom.png`;
+                lose = true;
+                // Добавить окончание игры: флажки и анимацию кнопки обновления поля
+            }
+        }
+        
+    });
+    });
+</script>
+</body>
+</html>
